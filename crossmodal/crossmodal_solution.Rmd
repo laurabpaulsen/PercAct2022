@@ -28,19 +28,21 @@ Enjoy!
 ## Load in data
 
 ### Download data
-First of all, you need to download the data from the Google drive folder: **https://drive.google.com/drive/folders/19HsBvrrnRynsn0z90iZhqL5SRaj-nnlw?usp=sharing**
+First of all, you need to download the data from the Google drive folder: **https://drive.google.com/drive/folders/19HsBvrrnRynsn0z90iZhqL5SRaj-nnlw?usp=sharing** or just skip to the next step if you cloned the GitHub repo (data should be included).
 
 ### Load data
 Load in the data.
-```{r}
+```{r, message=FALSE}
 aud <- read_bulk(
   directory = 'data_aud/',
-  fun = read_csv
+  fun = read_csv,
+  col_types = cols()  # suppresses the annoying column specifications (not needed to run)
   )
 
 vis <- read_bulk(
   directory = 'data_vis/',
-  fun = read_csv
+  fun = read_csv,
+  col_types = cols()
   )
 ```
 Hint: you can use read_bulk() from the readbulk package to load the different csv files into one dataframe (one df for vision, one for audition). 
@@ -61,6 +63,7 @@ colnames(aud)
 ```
 
 Which variables are we interested in? 
+**Write your answer here**
 
 Are the variables in the right format (e.g., factor, numeric)? If they are not, make sure they are.
 ```{r}
@@ -79,6 +82,12 @@ vis <- vis %>%
     congruency = as.factor(congruency),
     subject = as.factor(subject)
 )
+```
+
+How many participants do we have in each condition?
+```{r}
+length(unique(aud$subject))
+length(unique(vis$subject))
 ```
 
 Create new dataframes that only contains the correct trials. The dataframes with both correct and incorrect trials will be used in the last part of the exercise, so do not overwrite this. 
@@ -102,7 +111,8 @@ aud_correct %>%
   stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
   stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
   theme(legend.position = 'None') +
-  labs(title = 'Mean RT of audition with SE errorbars')
+  labs(title = 'Mean RT of audition with SE errorbars') +
+  theme_classic()
 
 # VISION
 vis_correct %>% 
@@ -112,7 +122,8 @@ vis_correct %>%
   stat_summary(fun = 'mean', geom = 'line', color = 'gray55', aes(group = 1)) +
   stat_summary(fun.data = "mean_se", geom = "errorbar", width = .1) +
   theme(legend.position = 'None') +
-  labs(title = 'Mean RT of vision with SE errorbars')
+  labs(title = 'Mean RT of vision with SE errorbars')+
+  theme_classic()
 ```
 
 ### Discussion
@@ -134,7 +145,7 @@ summary(m_vis)
 ```
 
 ### Report the results
-Write a sentence or two reporting the results of the two linear models (APA style).
+Imagine this was your exam project. What would you write in the results section? Write a sentence or two reporting the results of the two linear models (APA style).
 
 
 # Visualization of accuracy rate
@@ -143,14 +154,15 @@ Make a graph of the accuracy rate. Is there a way to visualize the relationship 
 ```{r}
 # AUDITION
 p1 <- aud %>% 
-   group_by(subject, congruency) %>%
+  group_by(subject, congruency) %>%
   filter(accuracy == 'FALSE') %>% 
-   summarize(perc_acc=(n()/32)*100) %>% #32 trials per participant
+  summarize(perc_acc=(n()/32)*100) %>% #32 trials per participant
   ggplot +
-   aes(x=congruency, y=perc_acc, color=subject) + 
+  aes(x=congruency, y=perc_acc, color=subject) + 
   geom_point() + 
   geom_line(aes(group=subject)) +
-   labs(title = 'Audition')
+  labs(title = 'Audition') +
+  theme_classic()
 
 # VISION
 p2 <- vis %>% 
@@ -161,9 +173,17 @@ p2 <- vis %>%
   aes(x=congruency, y=perc_acc, color=subject) + 
   geom_point() + 
   geom_line(aes(group=subject)) +
-  labs(title = 'Vision')
+  labs(title = 'Vision') +
+  theme_classic()
+
+p1
+p2
 ```
 Hint: Which data frames contain both correct and incorrect trials?
 
 ### Discussion
-Discuss the resulting plots. 
+Discuss the resulting plots.
+
+
+## Optional (If you are done before time is up)
+Earlier you created a simple linear model to test if congruency predicted the reaction time. Are there other **Cough chough** bayesian **Cough cough** ways to investigate this? If so, give it a go!

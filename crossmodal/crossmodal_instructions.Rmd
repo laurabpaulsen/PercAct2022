@@ -28,7 +28,7 @@ Enjoy!
 ## Load in data
 
 ### Download data
-First of all, you need to download the data from the Google drive folder: **https://drive.google.com/drive/folders/19HsBvrrnRynsn0z90iZhqL5SRaj-nnlw?usp=sharing**
+First of all, you need to download the data from the Google drive folder: **https://drive.google.com/drive/folders/19HsBvrrnRynsn0z90iZhqL5SRaj-nnlw?usp=sharing** or just skip to the next step if you cloned the GitHub repo (data should be included).
 
 ### Load data
 Load in the data.
@@ -60,6 +60,12 @@ Are the variables in the right format (e.g., factor, numeric)? If they are not, 
 
 ```
 
+How many participants do we have in each condition?
+```{r}
+
+```
+
+
 Create new dataframes that only contains the correct trials. The dataframes with both correct and incorrect trials will be used in the last part of the exercise, so do not overwrite this. 
 ```{r}
 
@@ -86,7 +92,7 @@ To do this, make a simple linear model.
 ```
 
 ### Report the results
-Write a sentence or two reporting the results of the linear model APA style.
+Imagine this was your exam project. What would you write in the results section? Write a sentence or two reporting the results of the two linear models (APA style).
 
 
 # Visuallisation of accuracy rate
@@ -99,3 +105,9 @@ Hint: Which data frames contain both correct and incorrect trials?
 
 ### Discussion
 Discuss the resulting plots. 
+
+
+## Optional (If you are done before time is up)
+Earlier you created a simple linear model to test if congruency predicted the reaction time. Are there other **Cough chough** bayesian **Cough cough** ways to investigate this? If so, give it a go!
+
+
