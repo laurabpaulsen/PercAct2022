@@ -1,0 +1,220 @@
+---
+title: "Mousetracking Analysis"
+author: "Laura Bock Paulsen"
+date: "9/11/2022"
+output: html_document
+---
+
+For the analysis of your very own mouse-tracking data, we will be using a package called MouseTrap. In order to get acquainted with the package, we will play around with data from a single participant conduction the circle-square experiment. 
+
+The documentation for the package can be found here: <https://www.rdocumentation.org/packages/mousetrap/versions/3.1.5/topics/mousetrap>.
+
+Use this page to solve the following steps by finding and applying appropriate mousetrap functions. Also, writing ?function_name() in the console is great way of reading about the function in question.
+
+Call me for help whenever you get stuck (or take a quick look in the solutions file) :-)
+
+### Install packages and load in the data
+```{r}
+# loading packages
+pacman::p_load(mousetrap, tidyverse)
+
+# loading in data
+d <- read_csv('example_data/subject-3.csv')
+```
+
+### Turn the data into a mousetrap object
+```{r}
+m <- mt_import_mousetrap(d)
+```
+Take a moment to look at the structure that it created. What are the elements, what information does it provide?
+
+### Make a quick plot using the mt_plot() function
+Try to understand what the lines mean and how to “read” the graph. What seems weird about it when you think about how the experiment task looked like?
+```{r}
+# initial plot
+mt_plot(m)
+
+# specified
+mt_plot(data = m, use = 'trajectories')
+```
+
+### Make a plot in which the lines are coloured by condition
+The demo-experiment had different trial types for which we have different predictions. Make a plot that distinguishes these two conditions, e.g. by different colors. 
+```{r}
+mt_plot(m, color = 'trial_type')
+```
+
+
+### Mirror-symmetric mapping of movements
+Find a function that does a mirror-symmetric mapping of all the movements from the right side to the left side so that all movements overlap. Plot again. What does this function also do?
+```{r}
+# align the mouse trajectories to one side
+m <- mt_remap_symmetric(
+  m, 
+  use = 'trajectories',
+  remap_xpos = "left"
+  )
+
+# plot again
+mt_plot(
+  m, 
+  use = 'trajectories',
+  color = 'trial_type'
+  )
+
+# turns the data upside down, so it resembles the actual mouse tracking task
+```
+
+### Plot timestamps by xpos
+The standard plotting function shows x and y coordinates. Modify it so you plot timestamps by xpos. What do you see? What is this line in the beginning?
+```{r}
+mt_plot(
+  m, 
+  x = 'timestamps', # modifying the x-axis to plot timestamps
+  y = 'xpos',       # modifying the y-axis to plot the xpos
+  use = 'trajectories',
+  color = 'trial_type' 
+)
+```
+
+### Find a function that removes the initial phase without mouse-movement
+Find a function to remove this “line”.
+
+```{r}
+m <- mt_exclude_initiation(m)
+```
+
+Before plotting again (timestamps and xpos) think about how you expect it to look. Then plot it, to see if you were right.
+```{r}
+mt_plot(
+  m, 
+  x = 'timestamps', # modifying the x-axis to plot timestamps
+  y = 'xpos',       # modifying the y-axis to plot the xpos
+  use = 'trajectories',
+  color = 'trial_type' 
+)
+```
+
+
+### Time-normalize the data
+Apply the function “mt_time_normalize”
+```{r}
+m <- mt_time_normalize(m)
+```
+
+Now look at your data variable (the mt object) where a new matrix appeared. What do you notice? What does the function do? After you have thought about it yourself, check the documentation!
+
+
+### Plot the normalized trajectories
+Find out how to plot the normalized trajectories instead of the raw data.
+```{r}
+mt_plot(
+  m, 
+  use = 'tn_trajectories',
+  color = 'trial_type'
+)
+```
+
+
+### Play around with the mt_time_normalize() function
+Take a moment to play around with different numbers of steps in “mt_time_normalize” and see how that changes the shape of the trajectories, esp. when using very small numbers. Discuss what the decision about normalizing implies for the data analysis and interpretation. In the end, set the steps back to the default of 101.
+```{r}
+m_tn <- mt_time_normalize(
+  m,
+  nsteps = 101
+)
+
+#plot
+mt_plot(
+  m_tn, 
+  use = 'tn_trajectories',
+  color = 'trial_type'
+)
+```
+
+
+### Aggregated plots
+Now we want to visualize our “findings”. Find a function that will plot averages of all the “similar” movements and all the “dissimilar” movements.
+Think: Which trajectories do we need to use, the original or the time normalized? Why? Try plotting both to see whether you were right.
+```{r}
+mt_plot_aggregate(
+  m, 
+  use = 'trajectories',
+  color = 'trial_type'
+)
+
+mt_plot_aggregate(
+  m, 
+  use = 'tn_trajectories',
+  color = 'trial_type'
+) + 
+  labs(
+    title = 'Aggregated time-normalized mouse trajectories')
+```
+
+
+### Apply the function mt_measures()
+Apply the function “mt_measures” and look at the outcome in your data variable. 
+```{r}
+m <- mt_measures(m, use = 'tn_trajectories')
+```
+
+### Aggregating measures
+Now find a function that helps you aggregate some measures of your pleasing over the two trial_types.
+```{r}
+mt_measures_ag <- mt_aggregate(
+  m,
+  use = 'measures',
+  use_variables = c('MAD', 'xpos_flips','AUC', 'RT'), # if you want all of the measures, exclude this line
+  use2_variables = 'trial_type'
+  )
+
+mt_measures_ag
+```
+
+
+### Interpret the results
+Take a moment to think what these “results” could mean if this was a proper experiment which was not run by your instructor. How would you interpret this? Does this match your hypothesis? Especially look at the MAD (maximum absolute deviation from the direct path), the AUC (area under the curve) and the reaction time. 
+
+
+
+## Additional exercises
+
+### Removing incorrect trials
+Normally, you'd want to remove incorrect trials. As the mouse_trap object does not function with tidyverse, figure out how to remove potential incorrect trials from your mousetrap object. 
+```{r}
+m <- mt_subset(
+  m,
+  correct == '1'
+)
+```
+
+### Discussion of mt_align
+Would the function ‘mt_align’ be useful for this data? Why or why not?
+It can do the same as mt_remap symmetric, but it can also be used to rescale (here 'space-normalize') the data. 
+
+You could align the starting and end position, as we are only interested in the trajectory of the mouse movement, not the endpoint in it self. Also, because the end point could be anywhere within the stimulus (circle or square), it looks nice to drag the trajectories to the same point. 
+
+As we only have one participant, I wouldn't say it is necessary (or beneficial, besides it looks nice). 
+
+```{r}
+# an example of aligning the data
+m_align <- mt_align(
+  m,
+  use = 'trajectories',
+  dimensions = c("xpos", "ypos"),
+  coordinates = c(0,0,-350,250),
+  align_start = T,
+  align_end = T
+)
+  
+  # plot again
+mt_plot(
+  m_align, 
+  use = 'trajectories',
+)
+```
+
+
+
+
