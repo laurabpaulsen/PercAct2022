@@ -11,7 +11,7 @@ The documentation for the package can be found here: <https://www.rdocumentation
 
 Use this page to solve the following steps by finding and applying appropriate mousetrap functions. Also, writing ?function_name() in the console is great way of reading about the function in question.
 
-Call me for help whenever you get stuck (or take a quick look in the solutions file) :-)
+Call me for help whenever you get stuck (or take a quick look in the solutions file) :D
 
 
 ### Install packages and load in the data
@@ -113,6 +113,13 @@ Normally, you'd want to remove incorrect trials. As the mouse_trap object does n
 
 ### Discussion of mt_align
 Would the function ‘mt_align’ be useful for this data? Why or why not?
+```{r}
+
+```
+
+
+### ggplot
+As the mt_plot function uses ggplot, you can easily add themes, titles and such to make your plots look nice. Have a go at it!
 ```{r}
 
 ```
