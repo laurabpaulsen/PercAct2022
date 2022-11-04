@@ -1,0 +1,48 @@
+---
+title: "3D plotting in R"
+author: "Laura Bock Paulsen"
+date: "11/4/2022"
+output: html_document
+---
+
+```{r}
+pacman::p_load('rgl')
+```
+
+
+System requirements for rgl:
+OpenGL and GLU Library (Required for display in R. See "Installing OpenGL support" in README.md. Not needed if only browser displays using rglwidget() are wanted.), zlib (optional), libpng (>=1.2.9, optional), FreeType (optional), pandoc (>=1.14, needed for vignettes)
+
+*Note: I made it work by ensuring that i have XQuartz*
+
+
+### Reading in the data
+```{r}
+d <- read.table('task1_data/group3_task1.tsv', sep="\t", header=FALSE, skip = 11, 
+                  col.names=c('frame','t','x','y','z'))
+```
+
+
+```{r}
+### CUSTOM FUNCTION TO INITIATE RGL WINDOW ###
+#' @param new.device a logical value. If TRUE, creates a new device
+#' @param bg the background color of the device
+#' @param width the width of the device
+rgl_init <- function(new.device = FALSE, bg = "white", width = 640) { 
+  if( new.device | rgl.cur() == 0 ) {
+    rgl.open()
+    par3d(windowRect = 50 + c( 0, 0, width, width ) )
+    rgl.bg(color = bg )
+  }
+  rgl.clear(type = c("shapes", "bboxdeco"))
+  rgl.viewpoint(theta = 15, phi = 20, zoom = 0.7)
+}
+```
+
+
+```{r}
+rgl_init() # Open a new RGL device
+points3d(-d$y, d$x, d$z, color ="orange") # Scatter plot
+rgl.bbox(color = c("red", 'black'), alpha = 0.8) # Add bounding box decoration
+```
+
