@@ -1,0 +1,242 @@
+---
+title: "Motion Lab - instructions"
+author: "Cordula Vesper & Laura Bock Paulsen"
+date: "11/4/2022"
+output: html_document
+---
+
+The aim of this exercise is to extract a couple of potentially interesting parameters from movement data - broadly inspired by Ansuini et al., 2008, "An object for an action, the same object for other actions: effects on hand shaping". 
+Conditions:
+1 grasp
+2 throw
+3 pour
+4 place
+5 pass
+
+Instead of their parameters, we use some other (often used) parameters for reaching and grasping: 
+- Reach onset: From trial start to reaching movement start
+- Reach duration: Duration of the reaching phase towards the object
+- Max reach velocity: maximum speed in the reach phase
+- Max reach height: maximum amplitude in z in the reach phase
+- Reach aperture: distance between index finger and thumb during reaching and grasping
+
+
+
+## Getting started
+
+### Loading packages
+For today we will be needing two packages, namely signal and tidyverse. Load them in.
+```{r}
+
+```
+
+
+### Reading in data file
+To illustrate how you can analyse motion data, 2-3 example files will be used. They can be found in the data folder. Start with just one file (ansuini_8475_3.csv), a grasping action; then later repeat the whole process with the other file (ansuini_8475_4.csv), a throwing action, so we can compare those two different actions. 
+In the end, you can also add a third file (ansuini_8475_2.csv), a pouring action. Note that in this file, there are missing data; however, as they occur later than our section of interest and will, in fact, be filtered out, we can ignore this. 
+```{r}
+
+```
+
+### Initial plotting to understand the data
+To inspect the data create a plot that fulfills the following:
+1) has the frame on the x-axis
+2) X position of the all three markers on the y-axis
+
+Hint: use geom_line for each of the three markers
+```{r}
+
+```
+
+#### Cleaning the data
+From the plot you have just made you might see that the frame does not start at 0. Modify the frame variable in such a way that it starts at 0 and increases with 1 for each frame recorded.
+```{r}
+
+```
+
+Do the same for the timestamp. However, let's clean up the timestamp a little so that we can more easily interpret the numbers. Make a new column called 'time' that is the timestamp divided by 1000000. This will give us the time in seconds. (To check: Our sample rate is 300 Hz, so after 300 frames, we should have reached one second.)
+```{r}
+
+```
+
+Similarly, let's make the position data more meaningful. By dividing by 10, we get the values in cm. Do this for all the four markers and all three dimensions. (Although we only use index finger and thumb in the following.)
+```{r}
+
+```
+
+
+## Cool calculations!!!
+Now lets move on to the cool and a bit more tricky part - calculating velocity, acceleration, grasp aperture, reach onset and duration. 
+
+### Velocity of the index finger
+Remind yourself of how to calculate the velocities. Create a new column in the data set which contains the velocity of the index finger along the x-axis.
+
+**Hints:** 
+* Velocity for the first point can be set to 0. Question: Why is such a trick needed? 
+* ?diff()
+```{r}
+
+```
+
+
+#### Plot the velocity over time! 
+```{r}
+
+```
+
+#### Filter the velocity
+You might notice that it looks a bit strange. This is where the signal-package comes in to play. It has a function called filtfilt() which can be used to "smooth" the signal. 
+The specific filter we use here is called a Butterworth filter (or 'butter'). It comes with three parameters the order (here: 2), the cutoff value and what type of filter it is (here: low-pass filter).  
+Create a new column with the filtered velocity. Plot again after filtering and overlay the filtered trajectory on top of the unfiltered one. 
+
+Afterwards, repeat these two steps to play around with different filter cutoffs. Observe what changing the value does to the raw data. 
+```{r}
+
+```
+
+```{r}
+
+```
+
+### Acceleration of the index finger
+Now calculate the acceleration of the index finger along the x-axis using the filtered velocity. 
+```{r}
+
+```
+
+Now filter the acceleration. You can normally use the same filter parameters as for velocity. 
+```{r}
+
+```
+
+Plot both the filtered and unfiltered.
+```{r}
+
+```
+
+
+**Discussion:** How come the difference between filtered and unfiltered is much larger for the velocity compared to the acceleration?
+
+
+### Velocity of the index finger in 3D space
+Now that we have understood velocity and acceleration in one dimension, let's make it three-dimensional. Find the formula for calculating velocity in three dimensional space, and use it to do so.
+```{r}
+
+```
+
+Filter it!
+```{r}
+
+```
+
+Plot both filtered and unfiltered!
+```{r}
+
+```
+
+### Acceleration of the index finger in 3D space
+From the 3d-velocity, derive the 3d-acceleration.
+```{r}
+
+```
+
+Filter!
+```{r}
+
+```
+
+Plot both filtered and unfiltered!
+```{r}
+
+```
+
+
+### Find change points in acceleration (zero crossings)
+Lets find the points at which the acceleration switches from being positive to negative and vice versa. 
+
+The goal is to have a column with TRUE and FALSE which indicates whether it is a minimum in the velocity curve. Furthermore, we want another column which indicates whether it is a maximum in the velocity. 
+
+**Hints**
+* diff and sign are useful functions (also in combination :))
+```{r}
+
+```
+
+
+Plot the filtered velocity and add points at the minima and maxima using the acceleration zero crossings from before.
+```{r}
+
+```
+
+
+Correspondingly, plot these velocity minimum and maximum points onto the trajectory of the index finger (either just x or all three dimensions). 
+Question: What, then, do these points we found tell us about the actual movement, esp. in relation to our task? Which points / parts of the trajectory seem most relevant? 
+```{r}
+
+```
+
+
+### Investigating the reach phase
+
+#### Get the start and end points of the reaching phase
+Hint: 
+* the start of the reaching phase is the velocity minimum that has the highest frame number in the first phase (i.e. trialPhase==1, i.e. right before leaving the starting position)
+* the end of the reaching phase is the velocity minimum that has the smallest frame number in the second phase (i.e. trialPhase==2, i.e. right after having left the start position)
+```{r}
+
+```
+
+
+#### Plotting the reach phase!
+Create a plot with only the reach phase as position over time  
+```{r}
+
+```
+
+#### Determine the movement onset
+```{r}
+
+```
+
+
+#### Determine the reach duration 
+```{r}
+
+```
+
+#### Determine peak velocity with the reach phase
+```{r}
+
+```
+
+#### Determine max reach height with the reach phase
+```{r}
+
+```
+
+#### Determine the thumb-index aperture
+Create a new column with distance between the thumb and index finger.
+```{r}
+
+```
+
+#### Determine the maximum thumb-index aperture in the reaching phase
+```{r}
+
+```
+
+
+Export general file information like subjID, trial and cond along with your 5 kinematic parameters. After you preprocessed all three demo files, you can load these files with your summary data and plot (or, if we had more data, analyze) them.
+```{r}
+
+```
+
+
+## Challenge levels
+
+* Construct a statistical model for our data set, analyzing the effect of the different actions on the different parameters. 
+* Make a plot comparing the summary data of our two trials. 
+
+## More challenge levels
+* Calculate max reach height and max reach velocity for the wrist marker instead 
+* Calculate grasp height as the mid point of thumb height and index height
